@@ -2,9 +2,9 @@ from customtkinter import *
 import urllib.request
 import threading
 from tkinter.messagebox import askyesno
-#from wifi_ezwifi import Wifi
 from ezwifi import *
 import subprocess
+
 
 def get_current_wifi_ssid():
     try:
@@ -25,7 +25,7 @@ class MainWindow():
         self.main_wifi_window.title("Wi-Fi Manager")
         self.main_wifi_window.resizable(False, False)
 
-        self.connection_label = CTkLabel(self.main_wifi_window, text="인터넷 연결 상태: 확인 중...", font=("Arial", 20))
+        self.connection_label = CTkLabel(self.main_wifi_window, text="Internet Connection Status: Checking...", font=("Arial", 20))
         self.connection_label.grid(row=0, column=0, padx=10, pady=5, sticky="nw")
 
         self.connection_label.bind("<Button-1>", command=self.disconnect_wifi)
@@ -33,24 +33,22 @@ class MainWindow():
         self.wifi_frame_inner = CTkScrollableFrame(self.main_wifi_window, label_text="WIFI SSID")
         self.wifi_frame_inner.grid(row=1, column=0, columnspan=2,padx=10, pady=5, sticky="nw")
 
-        self.refresh_button = CTkButton(self.main_wifi_window, text="새로고침", command=self.refresh_wifi_list, width=60)
+        self.refresh_button = CTkButton(self.main_wifi_window, text="refresh", command=self.refresh_wifi_list, width=60)
         self.refresh_button.grid(row=0, column=1, padx=10, pady=5, sticky="w")
 
         self.infoframe = CTkFrame(self.main_wifi_window)
         self.infoframe.grid(row=3, column=0,columnspan = 2, padx=10, pady=5, sticky="we")
 
         self.warning_label = CTkLabel(self.infoframe, text="")
-        self.warning_label.pack(side=RIGHT, padx=5)  # 오른쪽에 5px의 간격 추가
+        self.warning_label.pack(side=RIGHT, padx=5) 
         self.warning_label2 = CTkLabel(self.infoframe, text="")
-        self.warning_label2.pack(side=LEFT, padx=5)  # 왼쪽에 5px의 간격 추가
+        self.warning_label2.pack(side=LEFT, padx=5) 
 
         self.refresh_wifi_list()
 
-        # 실시간으로 인터넷 연결 상태를 확인하는 함수 실행
         self.check_internet_connection()
-        # WLAN 클라이언트 핸들 닫기
     def disconnect_wifi(self, event=None):
-        if askyesno("Wi-Fi 연결 해제", "현재 Wi-Fi 연결을 해제하시겠습니까?"):
+        if askyesno("Disconnect from Wi-Fi", "Are you sure you want to disconnect from current Wi-Fi?"):
             self.disconnectwifi()
             self.connection_label.configure(text="◼ disconnected", text_color="red")
     def disconnectwifi(self,event = None):
@@ -151,24 +149,16 @@ class MainWindow():
     def show_connection_result(self, ssid, log):
         if log == True:
             self.msg = CTk()
-            label = CTkLabel(self.msg, text=f"{ssid}가 연결되었습니다")
+            label = CTkLabel(self.msg, text=f"{ssid} is connected")
             label.pack()
-            button = CTkButton(self.msg, text="확인", command=self.re)
+            button = CTkButton(self.msg, text="OK", command=self.re)
             button.pack(side=LEFT)
-            button2 = CTkButton(self.msg, text="종료", command=self.main_wifi_window.destroy)
+            button2 = CTkButton(self.msg, text="end", command=self.main_wifi_window.destroy)
             button2.pack(side=LEFT)
             self.msg.mainloop()
-        elif log == "Timeout":
-            self.msg = CTk()
-            label = CTkLabel(self.msg, text="일시적인 오류가 발생했습니다.")
-            label.pack()
-            button = CTkButton(self.msg, text="새로고침", command=self.re)
-            button.pack(side=LEFT)
-            button2 = CTkButton(self.msg, text="종료", command=self.main_wifi_window.destroy)
-            button2.pack(side=LEFT)
-            self.msg.mainloop()
+
         else:
-            dialog = CTkInputDialog(text=f"{ssid}의 비밀번호를 입력하세요", title=f"{ssid}에 연결 중")
+            dialog = CTkInputDialog(text=f"Please enter password for {ssid}", title=f"Connecting to {ssid}")
             Wifi().connect(ssid, dialog.get_input())
 
     def re(self):
